@@ -14,14 +14,19 @@ import Workstation from '../entities/Workstation';
 import spriteData from '../spriteData';
 
 const mapData = mapDataString(`
-# # # # # # # # # # # # # # # # #
-# · W T # T · · W T · W · · · T #
-# · · · · · · · · · · · · · · o ·
-# o · · # · · · # # # # · · # # #
-# # # # # · · · # W o W · · T W #
-# C C C # · · · T · · · · · · · #
-# o · · · · · · · · · · · · · o #
-# # # # # # # # # # # # # # # # #
+
+# # # # # # # # # #
+# T W · W · W · · #
+# · · o · · · · · ·
+# o · · · o · · · #
+# · W T W T W · · #
+# · · · o · · · T #
+# T · · · · · · · #
+# · W · W · W · · #
+# o · · · · · o · #
+· · · · o · T · · #
+# o W · W · W · T #
+# # # # # # # # # #
 `);
 
 const resolveMapTile: TileMapResolver = (type, x, y) => {
@@ -84,12 +89,17 @@ export default function OfficeScene() {
                 <ambientLight />
                 <TileMap data={mapData} resolver={resolveMapTile} definesMapSize />
             </GameObject>
-            <GameObject x={16} y={5}>
+            <GameObject x={9} y={9}>
                 <Collider />
                 <Interactable />
                 <ScenePortal name="exit" enterDirection={[-1, 0]} target="other/start" />
             </GameObject>
-            <Player x={15} y={5} />
+            <GameObject x={0} y={2}>
+                <Collider />
+                <Interactable />
+                <ScenePortal name="exit" enterDirection={[-1, 0]} target="test/start" />
+            </GameObject>
+            <Player x={8} y={9} />
         </>
     );
 }
