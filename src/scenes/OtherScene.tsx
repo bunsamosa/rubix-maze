@@ -12,7 +12,6 @@ import PizzaPickup from '../entities/PizzaPickup';
 import Plant from '../entities/Plant';
 import Player from '../entities/Player';
 import Workstation from '../entities/Workstation';
-import RubixButton from '../entities/RubixButton';
 
 const mapData = mapDataString(`
 # # # # # # # #
@@ -71,13 +70,6 @@ const resolveMapTile: TileMapResolver = (type, x, y) => {
                 <Fragment key={key}>
                     {floor}
                     <Plant {...position} />
-                </Fragment>
-            );
-        case 'R':
-            return (
-                <Fragment key={key}>
-                    {floor}
-                    <RubixButton {...position} />
                 </Fragment>
             );
         default:

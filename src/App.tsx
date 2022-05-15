@@ -1,5 +1,8 @@
 import { css, Global } from '@emotion/core';
 import React, { useEffect, useState } from 'react';
+import { Connection, PublicKey, clusterApiUrl, Commitment } from '@solana/web3.js';
+import * as web3 from '@solana/web3.js';
+import { Program, Provider } from '@project-serum/anchor';
 import AssetLoader from './@core/AssetLoader';
 import Game from './@core/Game';
 import Scene from './@core/Scene';
@@ -11,13 +14,30 @@ import TestScene from './scenes/TestScene';
 import soundData from './soundData';
 import spriteData from './spriteData';
 import globalStyles from './styles/global';
+const idl = require('./idl.json');
 
-const TEST_GIFS = [
-    'https://i.giphy.com/media/eIG0HfouRQJQr1wBzz/giphy.webp',
-    'https://media3.giphy.com/media/L71a8LW2UrKwPaWNYM/giphy.gif?cid=ecf05e47rr9qizx2msjucl1xyvuu47d7kf25tqt2lvo024uo&rid=giphy.gif&ct=g',
-    'https://media4.giphy.com/media/AeFmQjHMtEySooOc8K/giphy.gif?cid=ecf05e47qdzhdma2y3ugn32lkgi972z9mpfzocjj6z1ro4ec&rid=giphy.gif&ct=g',
-    'https://i.giphy.com/media/PAqjdPkJLDsmBRSYUp/giphy.webp',
-];
+// SystemProgram is a reference to the Solana runtime!
+const { SystemProgram, Keypair } = web3;
+
+// Create a keypair for the account that will hold the location data.
+const baseAccount = Keypair.generate();
+
+// Get our program's id from the IDL file.
+const programID = new PublicKey('Axs3RYZwZf1AKVVsAJrLmP9NbSuUPEEgjyxZRnUE8SvC');
+
+// Set our network to devnet.
+const network = clusterApiUrl('devnet');
+
+// Controls how we want to acknowledge when a transaction is "done".
+const opts = {
+    // preflightCommitment: "processed" as Commitment,
+    preflightCommitment: 'processed' as Commitment,
+};
+
+// const lastopts = {
+//     preflightCommitment: 'processed',
+//     commitment: 'processed'
+// }
 
 const styles = {
     root: (width: number, height: number) => css`
@@ -46,7 +66,7 @@ export default function App() {
     // State
     const [walletAddress, setWalletAddress] = useState(null);
     const [inputValue, setInputValue] = useState('');
-    const [gifList, setGifList] = useState([]);
+    const [locations, setLocations] = useState([]);
 
     // Actions
 
@@ -85,14 +105,9 @@ export default function App() {
         }
     };
 
-    const sendGif = async () => {
-        if (inputValue.length > 0) {
-            console.log('Gif link:', inputValue);
-            setGifList([...gifList, inputValue]);
-            setInputValue('');
-        } else {
-            console.log('Empty input. Try again.');
-        }
+    const updatedata = async () => {
+        console.log(inputValue);
+        setLocations(JSON.parse(inputValue));
     };
 
     const onInputChange = event => {
@@ -100,12 +115,18 @@ export default function App() {
         setInputValue(value);
     };
 
+    const getProvider = () => {
+        const connection = new Connection(network, opts.preflightCommitment);
+        const provider = new Provider(connection, window.solana, opts);
+        return provider;
+    };
+
     const renderConnectedContainer = () => (
         <div className="connected-container">
-            <form
+            {/* <form
                 onSubmit={event => {
                     event.preventDefault();
-                    sendGif();
+                    updatedata();
                 }}
             >
                 <input
@@ -117,7 +138,7 @@ export default function App() {
                 <button type="submit" className="cta-button submit-gif-button">
                     Submit
                 </button>
-            </form>
+            </form> */}
             <div css={styles.root(width, height)}>
                 <Game cameraZoom={80}>
                     <AssetLoader urls={urls} placeholder="Loading assets ...">
@@ -148,6 +169,19 @@ export default function App() {
         </button>
     );
 
+    const getLocations = async () => {
+        try {
+            const provider = getProvider();
+            const program = new Program(idl, programID, provider);
+            const account = await program.account.baseAccount.fetch(
+                baseAccount.publicKey
+            );
+            setLocations(account.locations);
+        } catch (error) {
+            setLocations([]);
+        }
+    };
+
     // UseEffects
     useEffect(() => {
         const onLoad = async () => {
@@ -159,12 +193,10 @@ export default function App() {
 
     useEffect(() => {
         if (walletAddress) {
-            console.log('Fetching GIF list...');
+            console.log('Fetching location data');
 
             // Call Solana program here.
-
-            // Set state
-            setGifList(TEST_GIFS);
+            updatedata();
         }
     }, [walletAddress]);
 
