@@ -27,6 +27,11 @@ const styles = {
         justify-content: center;
         align-items: center;
     `,
+    buttonStyles: css`
+        position: absolute;
+        top: 700px;
+        left: 60%;
+    `,
 };
 
 const urls = [
@@ -100,9 +105,15 @@ export default function App() {
         setInputValue(value);
     };
 
+    // const buttonStyles = {
+    //     position: 'absolute',
+    //     top: '700px',
+    //     left: '60%',
+    // };
+
     const renderConnectedContainer = () => (
         <div className="connected-container">
-            <form
+            {/* <form
                 onSubmit={event => {
                     event.preventDefault();
                     sendGif();
@@ -117,6 +128,17 @@ export default function App() {
                 <button type="submit" className="cta-button submit-gif-button">
                     Submit
                 </button>
+            </form> */}
+            <form css={styles.buttonStyles}>
+                <button type="submit" className="game-btn">
+                    Wiki
+                </button>
+                <button type="submit" className="game-btn">
+                    Host
+                </button>
+                <button type="submit" className="game-btn">
+                    Conquer
+                </button>
             </form>
             <div css={styles.root(width, height)}>
                 <Game cameraZoom={80}>
@@ -125,6 +147,7 @@ export default function App() {
                             <Scene id="office">
                                 <OfficeScene />
                             </Scene>
+
                             <Scene id="other">
                                 <OtherScene />
                             </Scene>

@@ -21,5 +21,10 @@ export default function globalStyles() {
             color: white;
             background: black;
         }
+        buttonStyles {
+            position: 'absolute',
+            top: '700px',
+            left: '60%',
+        }
     `;
 }
