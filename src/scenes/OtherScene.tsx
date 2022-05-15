@@ -12,7 +12,6 @@ import PizzaPickup from '../entities/PizzaPickup';
 import Plant from '../entities/Plant';
 import Player from '../entities/Player';
 import Workstation from '../entities/Workstation';
-import RubixButton from '../entities/RubixButton';
 
 const mapData = mapDataString(`
 # # # # # # # #
@@ -73,26 +72,14 @@ const resolveMapTile: TileMapResolver = (type, x, y) => {
                     <Plant {...position} />
                 </Fragment>
             );
-        case 'R':
-            return (
-                <Fragment key={key}>
-                    {floor}
-                    <RubixButton {...position} />
-                </Fragment>
-            );
         default:
             return null;
     }
 };
 
 export default function OtherScene() {
-    const renderConnectedContainer = () => (
-        <div>
-            <form>
-                <button type="submit" className="cta-button submit-gif-button">
-                    Submit
-                </button>
-            </form>
+    return (
+        <>
             <GameObject name="map">
                 <ambientLight />
                 <TileMap data={mapData} resolver={resolveMapTile} definesMapSize />
@@ -103,21 +90,6 @@ export default function OtherScene() {
                 <ScenePortal name="start" enterDirection={[1, 0]} target="office/exit" />
             </GameObject>
             <Player x={2} y={5} />
-        </div>
-    );
-    return (
-        <>
-            {/* <GameObject name="map">
-                <ambientLight />
-                <TileMap data={mapData} resolver={resolveMapTile} definesMapSize />
-            </GameObject>
-            <GameObject x={0} y={5}>
-                <Collider />
-                <Interactable />
-                <ScenePortal name="start" enterDirection={[1, 0]} target="office/exit" />
-            </GameObject>
-            <Player x={2} y={5} /> */}
-            {renderConnectedContainer()}
         </>
     );
 }
