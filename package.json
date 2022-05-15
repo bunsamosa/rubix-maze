@@ -40,7 +40,7 @@
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
     "react-three-fiber": "^4.2.8",
-    "three": "^0.112.1",
+    "three": "*",
     "zustand": "^2.2.3"
   }
 }
