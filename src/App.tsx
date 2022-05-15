@@ -30,7 +30,14 @@ const styles = {
     buttonStyles: css`
         position: absolute;
         top: 700px;
-        left: 60%;
+        left: 65%;
+    `,
+    gamebtn: css`
+        width: 80px;
+        height: 35px;
+        background-color: white;
+        cursor: pointer;
+        margin: 5px;
     `,
 };
 
@@ -105,12 +112,6 @@ export default function App() {
         setInputValue(value);
     };
 
-    // const buttonStyles = {
-    //     position: 'absolute',
-    //     top: '700px',
-    //     left: '60%',
-    // };
-
     const renderConnectedContainer = () => (
         <div className="connected-container">
             {/* <form
@@ -130,13 +131,14 @@ export default function App() {
                 </button>
             </form> */}
             <form css={styles.buttonStyles}>
-                <button type="submit" className="game-btn">
+                <button type="submit" css={styles.gamebtn}>
                     Wiki
                 </button>
-                <button type="submit" className="game-btn">
+
+                <button type="submit" css={styles.gamebtn}>
                     Host
                 </button>
-                <button type="submit" className="game-btn">
+                <button type="submit" css={styles.gamebtn}>
                     Conquer
                 </button>
             </form>
