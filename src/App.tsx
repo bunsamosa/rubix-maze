@@ -20,6 +20,22 @@ const styles = {
         justify-content: center;
         align-items: center;
     `,
+    button:{
+        backgroundColor: 'white',
+        height: '3rem',
+        width: '10rem',
+        borderRadius: '10px',
+        textAlign: 'center' as const,
+        fontWeight: 'bold' as const,
+        fontSize: '1.5rem',
+        cursor: 'pointer' as const,
+    },
+    divAlign:{
+        display: 'flex',
+        flexDirection: 'column' as const,
+        marginLeft:'2rem',
+        marginRight:'-2rem',
+    }
 };
 
 const urls = [
@@ -71,11 +87,20 @@ export default function App() {
     // user connected - return game and logout button
     const renderConnectedContainer = () => (
         <div css={styles.root(width, height)}>
-            <p>
-                <button type="button" onClick={logOut} disabled={isAuthenticating}>
+            <div style={styles.divAlign}>
+                <button type="button" onClick={logOut} disabled={isAuthenticating} style={styles.button}>
                     Logout
                 </button>
-            </p>
+                <button type="button" style={styles.button}>
+                    Wiki
+                </button>
+                <button type="button" style={styles.button}>
+                    Host
+                </button>
+                <button type="button" style={styles.button}>
+                    Conquer
+                </button>
+            </div>
             <Game cameraZoom={80}>
                 <AssetLoader urls={urls} placeholder="Loading assets ...">
                     <SceneManager defaultScene="office">
