@@ -1,8 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { MoralisProvider } from 'react-moralis';
 import App from './App';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(
+    <React.StrictMode>
+        <MoralisProvider
+            serverUrl="https://pjsctz5bkqjc.usemoralis.com:2053/server"
+            appId="TBgozxOyrhwNWSqwPv6bKw0ZDb2PsH52d7GxEHRm"
+        >
+            <App />
+        </MoralisProvider>
+    </React.StrictMode>,
+    document.getElementById('root')
+);
 
 type RequestIdleCallbackHandle = any;
 type RequestIdleCallbackOptions = {
