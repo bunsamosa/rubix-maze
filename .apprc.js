@@ -25,6 +25,7 @@ module.exports = {
                 'jsx-a11y/interactive-supports-focus': 'off',
                 '@typescript-eslint/ban-ts-ignore': 'off',
                 '@typescript-eslint/no-namespace': 'off',
+                'prettier/prettier': 'off'
             },
         },
         babel: {
