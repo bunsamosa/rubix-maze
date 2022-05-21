@@ -16,7 +16,7 @@ import spriteData from '../spriteData';
 const mapData = mapDataString(`
 # # # # # # # # # # # # # # # # #
 # · W T # T · · W T · W · · · T #
-# · · · · · · · · · · · · · · o ·
+· · · · · · · · · · · · · · · o ·
 # o · · # · · · # # # # · · # # #
 # # # # # · · · # W o W · · T W #
 # C C C # · · · T · · · · · · · #
@@ -87,9 +87,14 @@ export default function OfficeScene() {
             <GameObject x={16} y={5}>
                 <Collider />
                 <Interactable />
-                <ScenePortal name="exit" enterDirection={[-1, 0]} target="other/start" />
+                <ScenePortal name="exit" enterDirection={[-1, 0]} target="park/start" />
             </GameObject>
-            <Player x={6} y={3} />
+            <GameObject x={0} y={5}>
+                <Collider />
+                <Interactable />
+                <ScenePortal name="exit" enterDirection={[-1, 0]} target="cafe/start" />
+            </GameObject>
+            <Player x={6} y={2} />
         </>
     );
 }
