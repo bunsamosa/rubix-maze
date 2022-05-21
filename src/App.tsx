@@ -8,7 +8,7 @@ import Scene from './@core/Scene';
 import SceneManager from './@core/SceneManager';
 import useWindowSize from './@core/useWindowSize';
 import OfficeScene from './scenes/OfficeScene';
-import OtherScene from './scenes/OtherScene';
+import ParkScene from './scenes/ParkScene';
 import soundData from './soundData';
 import spriteData from './spriteData';
 import globalStyles from './styles/global';
@@ -187,7 +187,7 @@ export default function App() {
                             <OfficeScene />
                         </Scene>
                         <Scene id="other">
-                            <OtherScene />
+                            <ParkScene />
                         </Scene>
                     </SceneManager>
                 </AssetLoader>
