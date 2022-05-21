@@ -20,10 +20,10 @@ export default function PlayerScript() {
     const [pathOverlayEnabled, setPathOverlayEnabled] = useState(true);
 
     // key controls
-    const leftKey = useKeyPress(['ArrowLeft', 'a']);
-    const rightKey = useKeyPress(['ArrowRight', 'd']);
-    const upKey = useKeyPress(['ArrowUp', 'w']);
-    const downKey = useKeyPress(['ArrowDown', 's']);
+    const leftKey = useKeyPress(['ArrowLeft']);
+    const rightKey = useKeyPress(['ArrowRight']);
+    const upKey = useKeyPress(['ArrowUp']);
+    const downKey = useKeyPress(['ArrowDown']);
 
     useGameLoop(() => {
         const direction = {
