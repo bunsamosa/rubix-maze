@@ -10,6 +10,7 @@ import useWindowSize from './@core/useWindowSize';
 import OfficeScene from './scenes/OfficeScene';
 import ParkScene from './scenes/ParkScene';
 import CafeScene from './scenes/CafeScene';
+import LibraryScene from './scenes/LibraryScene';
 import soundData from './soundData';
 import spriteData from './spriteData';
 import globalStyles from './styles/global';
@@ -192,6 +193,9 @@ export default function App() {
                         </Scene>
                         <Scene id="cafe">
                             <CafeScene />
+                        </Scene>
+                        <Scene id="library">
+                            <LibraryScene />
                         </Scene>
                     </SceneManager>
                 </AssetLoader>
