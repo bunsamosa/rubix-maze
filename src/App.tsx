@@ -1,5 +1,6 @@
 import { css, Global } from '@emotion/core';
 import React, { useEffect } from 'react';
+import Modal from 'react-modal';
 import { useMoralis } from 'react-moralis';
 import AssetLoader from './@core/AssetLoader';
 import Game from './@core/Game';
@@ -20,8 +21,8 @@ const styles = {
         justify-content: center;
         align-items: center;
     `,
-    button:{
-        backgroundColor: 'white',
+    button: {
+        backgroundColor: '#C4A484',
         height: '3rem',
         width: '10rem',
         borderRadius: '10px',
@@ -30,11 +31,52 @@ const styles = {
         fontSize: '1.5rem',
         cursor: 'pointer' as const,
     },
-    divAlign:{
+    divAlign: {
         display: 'flex',
         flexDirection: 'column' as const,
-        marginLeft:'2rem',
-        marginRight:'-2rem',
+        marginLeft: '2rem',
+        marginRight: '-2rem',
+    },
+    content: {
+        top: '50%',
+        left: '50%',
+        right: 'auto',
+        bottom: 'auto',
+        marginRight: '-50%',
+        transform: 'translate(-50%, -50%)',
+    },
+    closeButton: {
+        backgroundColor: 'red',
+        color: 'white',
+        fontSize: '1rem',
+        border: 'none',
+        cursor: 'pointer',
+        width: '5rem',
+        height: '2rem',
+        borderRadius: '5px'
+    },
+    modalButtons: {
+        backgroundColor: 'green',
+        color: 'white',
+        fontSize: '1rem',
+        border: 'none',
+        cursor: 'pointer',
+        width: '5rem',
+        height: '2rem',
+        borderRadius: '5px'
+    },
+    buttonDiv: {
+        display: 'flex',
+        flexDirection: 'row' as const,
+        gap: '1rem',
+        marginTop: '1rem',
+    },
+    textArea: {
+        width: '100%',
+        height: '10rem',
+    },
+    textAreaAlign: {
+        marginTop: '1rem',
     }
 };
 
@@ -56,6 +98,23 @@ export default function App() {
         account,
         logout,
     } = useMoralis();
+
+    // Modal changes
+    let subtitle;
+    const [modalIsOpen, setIsOpen] = React.useState(false);
+
+    function openModal() {
+        setIsOpen(true);
+    }
+
+    function afterOpenModal() {
+        // references are now sync'd and can be accessed.
+        subtitle.style.color = 'black';
+    }
+
+    function closeModal() {
+        setIsOpen(false);
+    }
 
     useEffect(() => {
         if (isAuthenticated) {
@@ -91,9 +150,29 @@ export default function App() {
                 <button type="button" onClick={logOut} disabled={isAuthenticating} style={styles.button}>
                     Logout
                 </button>
-                <button type="button" style={styles.button}>
-                    Wiki
-                </button>
+                <div>
+                    <button type="button" onClick={openModal} style={styles.button}>Wiki</button>
+                    <Modal
+                        isOpen={modalIsOpen}
+                        onAfterOpen={afterOpenModal}
+                        onRequestClose={closeModal}
+                        style={styles.content}
+                        contentLabel="Wiki Modal"
+                    >
+                        <h2 ref={(_subtitle) => { subtitle = _subtitle }}>Add You Wiki Here!</h2>
+                        <button type="button" onClick={closeModal} style={styles.closeButton}>close</button>
+                        <form>
+                            <div contentEditable='true' style={styles.textAreaAlign}>
+                                <textarea style={styles.textArea} placeholder='Type your wiki here...' />
+                            </div>
+                            <div style={styles.buttonDiv}>
+                                <button type="button" style={styles.modalButtons}>Save</button>
+                                <button type="button" style={styles.modalButtons}>Edit</button>
+                                <button type="button" style={styles.closeButton}>Delete</button>
+                            </div>
+                        </form>
+                    </Modal>
+                </div>
                 <button type="button" style={styles.button}>
                     Host
                 </button>
