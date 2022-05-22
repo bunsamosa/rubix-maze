@@ -23,6 +23,14 @@ const styles = {
         justify-content: center;
         align-items: center;
     `,
+    landingPage: {
+        backgroundColor: 'white',
+        height:'100rem',
+        display: 'flex',
+        flexDirection: 'row' as const,
+        justifyContent: 'center',
+        gap: '8rem',
+    },
     button: {
         backgroundColor: '#C4A484',
         height: '3rem',
@@ -79,6 +87,19 @@ const styles = {
     },
     textAreaAlign: {
         marginTop: '1rem',
+    },
+    h1Syle: {
+        fontSize: '70px',
+        color: 'black',
+        marginTop: '120%'
+    },
+    h2Syle: {
+        fontSize: '30px',
+        color: 'black',
+        marginTop: '-10%'
+    },
+    landingLogo: {
+        height: '60%',
     }
 };
 
@@ -205,10 +226,17 @@ export default function App() {
 
     // user not connected - return login button
     const renderNotConnectedContainer = () => (
-        <div>
-            <button type="button" onClick={login}>
-                Login
-            </button>
+        <div style={styles.landingPage}>
+            <div>
+                <h1 style={styles.h1Syle}>The Maze</h1>
+                <h2 style={styles.h2Syle}>Explore - Host- Conquer</h2>
+                <button type="button" onClick={login} style={styles.modalButtons}>
+                    Login
+                </button>
+            </div>
+            <div>
+                <img {...spriteData.logo} alt="logo" style={styles.landingLogo} />
+            </div>
         </div>
     );
 
