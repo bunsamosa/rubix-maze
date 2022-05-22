@@ -57,6 +57,9 @@ const spriteData: { [index: string]: SpriteProps } = {
         opacity: 0.75,
         frameTime: 150,
     },
+    logo: {
+        src: './assets/maze.gif',
+    }
 };
 
 export default spriteData;
