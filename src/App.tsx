@@ -7,10 +7,7 @@ import Game from './@core/Game';
 import Scene from './@core/Scene';
 import SceneManager from './@core/SceneManager';
 import useWindowSize from './@core/useWindowSize';
-import OfficeScene from './scenes/OfficeScene';
-import ParkScene from './scenes/ParkScene';
-import CafeScene from './scenes/CafeScene';
-import LibraryScene from './scenes/LibraryScene';
+import GenericScene from './scenes/GenericScene';
 import soundData from './soundData';
 import spriteData from './spriteData';
 import globalStyles from './styles/global';
@@ -25,7 +22,7 @@ const styles = {
     `,
     landingPage: {
         backgroundColor: 'white',
-        height:'100rem',
+        height: '100rem',
         display: 'flex',
         flexDirection: 'row' as const,
         justifyContent: 'center',
@@ -108,6 +105,74 @@ const urls = [
     ...Object.values(soundData).map(data => data.src),
     // flatten
 ].reduce<string[]>((acc, val) => acc.concat(val), []);
+
+const placesData = {
+    "places": [
+        {
+            "name": "Truffles",
+            "place_id": "ChIJWXKnRHkWrjsRh3kh6fY55pg",
+            "lat": 12.9718226,
+            "lng": 77.6008918,
+            "rating": 4.5,
+            "tags": [
+                "cafe",
+                "restaurant",
+                "food",
+                "point_of_interest",
+                "establishment"
+            ],
+            "vicinity": "22, St Mark's Rd, Shanthala Nagar, Ashok Nagar, Bengaluru",
+            "location_name": "MG Road",
+            "best_time": "11 AM",
+            "best_travel_option": "Metro"
+        }
+    ]
+}
+
+// map data for game UI
+const mapStrings = {
+    'home': `
+# # # # # # # # # # # # #
+# T · · W T · W · · · T #
+· · · · · · · · · · · o ·
+# · · · # # # # · · # # #
+# · · · # W o W · · T W #
+# · · · T · · · · · · · #
+# · · · · · · · · · · o #
+# # # # # # # # # # # # #
+`,
+    'cafe': `
+# # # # # # # # # # # # #
+# C C · · · T T · · · C #
+· · · · W · · · · · · · ·
+# W · # · · T T · · W · #
+# W · # · · W # W · W · #
+# · · · · · · · · · · · #
+# C C C C C C C C C C C #
+# # # # # # # # # # # # #
+`,
+    'library': `
+# # # # # # # # # # # # #
+# S · · · · · · · · · C #
+· · · # S · · · · · · · ·
+# S · # S · · · · · · · #
+# S · # S S S · · · · · #
+# S · · · · S · · · · · #
+# S S S S S S · W W W W #
+# # # # # # # # # # # # #
+`,
+    'park': `
+# # T T T T T T T T T T T
+# · · · · · · T T T T T #
+· · · · · T · · · · · · ·
+# · T # · · · · · · · · #
+T · T # # · · T · · · · #
+T · T T T · · T · · T T #
+T · · · · · · T · · T T #
+# # # # # # # # # # # # #
+`
+}
+
 
 export default function App() {
     // find width and height
@@ -205,18 +270,18 @@ export default function App() {
             </div>
             <Game cameraZoom={80}>
                 <AssetLoader urls={urls} placeholder="Loading assets ...">
-                    <SceneManager defaultScene="office">
-                        <Scene id="office">
-                            <OfficeScene />
+                    <SceneManager defaultScene="home">
+                        <Scene id="library">
+                            <GenericScene mapString={mapStrings.library} inTarget="cafe/exit" outTarget="home/start" />
+                        </Scene>
+                        <Scene id="home">
+                            <GenericScene mapString={mapStrings.home} inTarget="library/exit" outTarget="park/start" />
                         </Scene>
                         <Scene id="park">
-                            <ParkScene />
+                            <GenericScene mapString={mapStrings.park} inTarget="home/exit" outTarget="cafe/start" />
                         </Scene>
                         <Scene id="cafe">
-                            <CafeScene />
-                        </Scene>
-                        <Scene id="library">
-                            <LibraryScene />
+                            <GenericScene mapString={mapStrings.cafe} inTarget="park/exit" outTarget="library/start" />
                         </Scene>
                     </SceneManager>
                 </AssetLoader>

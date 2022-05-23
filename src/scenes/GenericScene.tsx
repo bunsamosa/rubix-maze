@@ -6,24 +6,14 @@ import ScenePortal from '../@core/ScenePortal';
 import Sprite from '../@core/Sprite';
 import TileMap, { TileMapResolver } from '../@core/TileMap';
 import { mapDataString } from '../@core/utils/mapUtils';
-import Player from '../entities/Player';
-import spriteData from '../spriteData';
-import Plant from '../entities/Plant';
 import CoffeeMachine from '../entities/CoffeeMachine';
+import PizzaPickup from '../entities/PizzaPickup';
+import Plant from '../entities/Plant';
+import Player from '../entities/Player';
 import Workstation from '../entities/Workstation';
+import spriteData from '../spriteData';
 import Shelf from '../entities/Shelf';
 
-const mapData = mapDataString(`
-
-# # # # # # # # # # #
-# S · · · · · · · C #
-# S · # W · · · · # #
-# S · # W · · · · · #
-# S · # W · W # · W #
-# S · · · · · # · · #
-# S S S S S S S T · ·
-# # # # # # # # # # #
-`);
 
 const resolveMapTile: TileMapResolver = (type, x, y) => {
     const key = `${x}-${y}`;
@@ -38,6 +28,13 @@ const resolveMapTile: TileMapResolver = (type, x, y) => {
     switch (type) {
         case '·':
             return floor;
+        case 'o':
+            return (
+                <Fragment key={key}>
+                    {floor}
+                    <PizzaPickup {...position} />
+                </Fragment>
+            );
         case '#':
             return (
                 <GameObject key={key} {...position} layer="wall">
@@ -45,11 +42,11 @@ const resolveMapTile: TileMapResolver = (type, x, y) => {
                     <Sprite {...spriteData.objects} state="wall" />
                 </GameObject>
             );
-        case 'T':
+        case 'W':
             return (
                 <Fragment key={key}>
                     {floor}
-                    <Plant {...position} />
+                    <Workstation {...position} />
                 </Fragment>
             );
         case 'C':
@@ -59,11 +56,11 @@ const resolveMapTile: TileMapResolver = (type, x, y) => {
                     <CoffeeMachine {...position} />
                 </Fragment>
             );
-        case 'W':
+        case 'T':
             return (
                 <Fragment key={key}>
                     {floor}
-                    <Workstation {...position} />
+                    <Plant {...position} />
                 </Fragment>
             );
         case 'S':
@@ -78,19 +75,25 @@ const resolveMapTile: TileMapResolver = (type, x, y) => {
     }
 };
 
-export default function LibraryScene() {
+export default function GenericScene({ mapString, inTarget, outTarget }) {
+    const mapData = mapDataString(mapString);
     return (
         <>
             <GameObject name="map">
                 <ambientLight />
                 <TileMap data={mapData} resolver={resolveMapTile} definesMapSize />
             </GameObject>
-            <GameObject x={10} y={1}>
+            <GameObject x={0} y={5}>
                 <Collider />
                 <Interactable />
-                <ScenePortal name="start" enterDirection={[1, 0]} target="office/exit" />
+                <ScenePortal name="start" enterDirection={[1, 0]} target={inTarget} />
             </GameObject>
-            <Player x={10} y={1} />
+            <GameObject x={12} y={5}>
+                <Collider />
+                <Interactable />
+                <ScenePortal name="exit" enterDirection={[-1, 0]} target={outTarget} />
+            </GameObject>
+            <Player x={1} y={5} />
         </>
     );
 }
