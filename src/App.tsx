@@ -4,7 +4,8 @@ import Modal from 'react-modal';
 import { useMoralis } from 'react-moralis';
 import { styles } from './app/Styles';
 import { ipfsHash, ipfsGateway } from './app/ipfsData';
-import { ABI } from './app/contractData';
+import { balanceFunction, rewardFunction } from './app/contractData';
+import { Triangle } from 'react-loader-spinner';
 import AssetLoader from './@core/AssetLoader';
 import Game from './@core/Game';
 import Scene from './@core/Scene';
@@ -47,6 +48,7 @@ let userAddress = "";
 export default function App() {
     // find width and height
     const [width, height] = useWindowSize();
+    const [isLoading, setIsLoading] = React.useState(false);
 
     // initialize moralis sdk
     const {
@@ -57,25 +59,6 @@ export default function App() {
         account,
         logout,
     } = useMoralis();
-
-    // function call options to add reward
-    const rewardFunction = {
-        chain: Moralis.Chains.POLYGON_MUMBAI,
-        address: "0x69d33A63B775542AEE4cBc432AD990046D160a4d",
-        function_name: "reward",
-        abi: ABI,
-        params: { addr: userAddress },
-    };
-
-    // function call options to get balance
-    const balanceFunction = {
-        chain: Moralis.Chains.POLYGON_MUMBAI,
-        address: "0x69d33A63B775542AEE4cBc432AD990046D160a4d",
-        function_name: "get",
-        abi: ABI,
-        params: { addr: userAddress },
-    };
-
 
     // Modal changes
     let subtitle;
@@ -121,14 +104,38 @@ export default function App() {
         }
     }, [isAuthenticated]);
 
-    // login button call
-    const login = async () => {
+    // login with metamask
+    const metamaskLogin = async () => {
+        setIsLoading(true);
         if (!isAuthenticated) {
-            await authenticate({ signingMessage: 'Log in using Moralis' })
+            await authenticate({
+                signingMessage: "Log in to Rubix",
+                chainId: 8001,
+            })
                 .then(function (user) {
-                    console.log('logged in user:', user);
+                    console.log('Metamask login:', user);
                     userAddress = user!.get('ethAddress');
-                    console.log(user!.get('ethAddress'));
+                    console.log("Logging in: ", userAddress);
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        };
+        setIsLoading(false);
+    };
+
+    // login with walletconnect
+    const walletLogin = async () => {
+        if (!isAuthenticated) {
+            await authenticate({
+                provider: "walletconnect",
+                signingMessage: "Log in to Rubix",
+                chainId: 80001,
+            })
+                .then(function (user) {
+                    console.log('Walletconnect login:', user);
+                    userAddress = user!.get('ethAddress');
+                    console.log("Logging in: ", userAddress);
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -144,6 +151,13 @@ export default function App() {
 
     // save data to IPFS
     const saveData = async () => {
+        setIsLoading(true);
+        const web3provider = await Moralis.enableWeb3();
+        rewardFunction.params.addr = userAddress;
+        console.log("Calling reward function: ", rewardFunction);
+        const transaction = await Moralis.executeFunction(rewardFunction);
+        console.log(transaction.hash);
+
         // ipfs call
         if (dataFetched) {
             const file = new Moralis.File("rubix_places.json", {
@@ -152,9 +166,7 @@ export default function App() {
             await file.saveIPFS();
             console.log(file.toJSON());
         };
-
-        // add reward to the user
-        await Moralis.Web3API.native.runContractFunction(rewardFunction);
+        setIsLoading(false);
     };
 
     // user connected - return game and logout button
@@ -224,10 +236,17 @@ export default function App() {
         <div style={styles.landingPage}>
             <div>
                 <h1 style={styles.h1Syle}>The Maze</h1>
-                <h2 style={styles.h2Syle}>Explore - Host- Conquer</h2>
-                <button type="button" onClick={login} style={styles.modalButtons}>
-                    Login
-                </button>
+                <h2 style={styles.h2Syle}>Explore - Contribute - Conquer</h2>
+                <p>
+                    <button type="button" onClick={metamaskLogin} style={styles.button}>
+                        Metamask
+                    </button>
+                </p>
+                <p>
+                    <button type="button" onClick={walletLogin} style={styles.button}>
+                        Wallet
+                    </button>
+                </p>
             </div>
             <div>
                 <img {...spriteData.logo} alt="logo" style={styles.landingLogo} />
@@ -235,12 +254,24 @@ export default function App() {
         </div>
     );
 
+    const renderLoader = () => (
+        <span className='centered'>
+            <Triangle
+                height="100"
+                width="100"
+                color='red'
+                ariaLabel='loading'
+            />
+        </span>
+    );
+
     return (
         <>
             <Global styles={globalStyles} />
             <p>
-                {isAuthenticated && renderConnectedContainer()}
-                {!isAuthenticated && renderNotConnectedContainer()}
+                {isLoading && renderLoader()}
+                {isAuthenticated && !isLoading && renderConnectedContainer()}
+                {!isAuthenticated && !isLoading && renderNotConnectedContainer()}
             </p>
 
 
