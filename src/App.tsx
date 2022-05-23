@@ -1,104 +1,19 @@
-import { css, Global } from '@emotion/core';
+import { Global } from '@emotion/core';
 import React, { useEffect } from 'react';
 import Modal from 'react-modal';
 import { useMoralis } from 'react-moralis';
+import { styles } from './app/Styles';
+import { ipfsHash, ipfsGateway } from './app/ipfsData';
 import AssetLoader from './@core/AssetLoader';
 import Game from './@core/Game';
 import Scene from './@core/Scene';
 import SceneManager from './@core/SceneManager';
 import useWindowSize from './@core/useWindowSize';
 import GenericScene from './scenes/GenericScene';
+import { mapStrings } from './scenes/MapStrings'
 import soundData from './soundData';
 import spriteData from './spriteData';
 import globalStyles from './styles/global';
-
-const styles = {
-    root: (width: number, height: number) => css`
-        display: flex;
-        width: ${width - (width % 2)}px;
-        height: ${height - (height % 2)}px;
-        justify-content: center;
-        align-items: center;
-    `,
-    landingPage: {
-        backgroundColor: 'white',
-        height: '100rem',
-        display: 'flex',
-        flexDirection: 'row' as const,
-        justifyContent: 'center',
-        gap: '8rem',
-    },
-    button: {
-        backgroundColor: '#C4A484',
-        height: '3rem',
-        width: '10rem',
-        borderRadius: '10px',
-        textAlign: 'center' as const,
-        fontWeight: 'bold' as const,
-        fontSize: '1.5rem',
-        cursor: 'pointer' as const,
-    },
-    divAlign: {
-        display: 'flex',
-        flexDirection: 'column' as const,
-        marginLeft: '2rem',
-        marginRight: '-2rem',
-    },
-    content: {
-        top: '50%',
-        left: '50%',
-        right: 'auto',
-        bottom: 'auto',
-        marginRight: '-50%',
-        transform: 'translate(-50%, -50%)',
-    },
-    closeButton: {
-        backgroundColor: 'red',
-        color: 'white',
-        fontSize: '1rem',
-        border: 'none',
-        cursor: 'pointer',
-        width: '5rem',
-        height: '2rem',
-        borderRadius: '5px'
-    },
-    modalButtons: {
-        backgroundColor: 'green',
-        color: 'white',
-        fontSize: '1rem',
-        border: 'none',
-        cursor: 'pointer',
-        width: '5rem',
-        height: '2rem',
-        borderRadius: '5px'
-    },
-    buttonDiv: {
-        display: 'flex',
-        flexDirection: 'row' as const,
-        gap: '1rem',
-        marginTop: '1rem',
-    },
-    textArea: {
-        width: '100%',
-        height: '10rem',
-    },
-    textAreaAlign: {
-        marginTop: '1rem',
-    },
-    h1Syle: {
-        fontSize: '70px',
-        color: 'black',
-        marginTop: '120%'
-    },
-    h2Syle: {
-        fontSize: '30px',
-        color: 'black',
-        marginTop: '-10%'
-    },
-    landingLogo: {
-        height: '60%',
-    }
-};
 
 const urls = [
     ...Object.values(spriteData).map(data => data.src),
@@ -106,73 +21,7 @@ const urls = [
     // flatten
 ].reduce<string[]>((acc, val) => acc.concat(val), []);
 
-const placesData = {
-    "places": [
-        {
-            "name": "Truffles",
-            "place_id": "ChIJWXKnRHkWrjsRh3kh6fY55pg",
-            "lat": 12.9718226,
-            "lng": 77.6008918,
-            "rating": 4.5,
-            "tags": [
-                "cafe",
-                "restaurant",
-                "food",
-                "point_of_interest",
-                "establishment"
-            ],
-            "vicinity": "22, St Mark's Rd, Shanthala Nagar, Ashok Nagar, Bengaluru",
-            "location_name": "MG Road",
-            "best_time": "11 AM",
-            "best_travel_option": "Metro"
-        }
-    ]
-}
-
-// map data for game UI
-const mapStrings = {
-    'home': `
-# # # # # # # # # # # # #
-# T · · W T · W · · · T #
-· · · · · · · · · · · o ·
-# · · · # # # # · · # # #
-# · · · # W o W · · T W #
-# · · · T · · · · · · · #
-# · · · · · · · · · · o #
-# # # # # # # # # # # # #
-`,
-    'cafe': `
-# # # # # # # # # # # # #
-# C C · · · T T · · · C #
-· · · · W · · · · · · · ·
-# W · # · · T T · · W · #
-# W · # · · W # W · W · #
-# · · · · · · · · · · · #
-# C C C C C C C C C C C #
-# # # # # # # # # # # # #
-`,
-    'library': `
-# # # # # # # # # # # # #
-# S · · · · · · · · · C #
-· · · # S · · · · · · · ·
-# S · # S · · · · · · · #
-# S · # S S S · · · · · #
-# S · · · · S · · · · · #
-# S S S S S S · W W W W #
-# # # # # # # # # # # # #
-`,
-    'park': `
-# # T T T T T T T T T T T
-# · · · · · · T T T T T #
-· · · · · T · · · · · · ·
-# · T # · · · · · · · · #
-T · T # # · · T · · · · #
-T · T T T · · T · · T T #
-T · · · · · · T · · T T #
-# # # # # # # # # # # # #
-`
-}
-
+let placesData = {};
 
 export default function App() {
     // find width and height
@@ -180,6 +29,7 @@ export default function App() {
 
     // initialize moralis sdk
     const {
+        Moralis,
         authenticate,
         isAuthenticated,
         isAuthenticating,
@@ -193,21 +43,30 @@ export default function App() {
 
     function openModal() {
         setIsOpen(true);
-    }
+    };
 
     function afterOpenModal() {
         // references are now sync'd and can be accessed.
         subtitle.style.color = 'black';
-    }
+    };
 
     function closeModal() {
         setIsOpen(false);
-    }
+    };
+
+    const readData = async () => {
+        const url = `${ipfsGateway}${ipfsHash}`;
+        console.log(url);
+        const response = await fetch(url);
+        placesData = await response.json();
+        console.log(placesData);
+        return placesData;
+    };
 
     useEffect(() => {
         if (isAuthenticated) {
-            // add further logic here
-            // fetch game map
+            // fetch places data
+            readData();
         }
     }, [isAuthenticated]);
 
@@ -226,16 +85,25 @@ export default function App() {
     };
 
     // logout button call
-    const logOut = async () => {
+    const appLogOut = async () => {
         await logout();
         console.log('logged out');
+    };
+
+    // save data to IPFS
+    const saveData = async () => {
+        const file = new Moralis.File("rubix_places.json", {
+            base64: btoa(JSON.stringify(placesData)),
+        });
+        await file.saveIPFS();
+        console.log(file.toJSON());
     };
 
     // user connected - return game and logout button
     const renderConnectedContainer = () => (
         <div css={styles.root(width, height)}>
             <div style={styles.divAlign}>
-                <button type="button" onClick={logOut} disabled={isAuthenticating} style={styles.button}>
+                <button type="button" onClick={appLogOut} disabled={isAuthenticating} style={styles.button}>
                     Logout
                 </button>
                 <div>
@@ -254,7 +122,7 @@ export default function App() {
                                 <textarea style={styles.textArea} placeholder='Type your wiki here...' />
                             </div>
                             <div style={styles.buttonDiv}>
-                                <button type="button" style={styles.modalButtons}>Save</button>
+                                <button type="button" style={styles.modalButtons} onClick={saveData}>Save</button>
                                 <button type="button" style={styles.modalButtons}>Edit</button>
                                 <button type="button" style={styles.closeButton}>Delete</button>
                             </div>
