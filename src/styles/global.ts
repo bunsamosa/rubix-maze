@@ -21,5 +21,11 @@ export default function globalStyles() {
             color: white;
             background: black;
         }
+        .centered {
+            height: 100vh; /* Magic here */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
     `;
 }

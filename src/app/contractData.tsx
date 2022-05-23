@@ -1,5 +1,5 @@
 // contract ABI data
-export const ABI = [
+const ABI = [
     {
         "inputs": [
             {
@@ -33,3 +33,19 @@ export const ABI = [
         "type": "function"
     }
 ]
+
+// function call options to add reward
+export const rewardFunction = {
+    contractAddress: "0x69d33A63B775542AEE4cBc432AD990046D160a4d",
+    abi: ABI,
+    functionName: "reward",
+    params: { addr: "" },
+};
+
+// function call options to get balance
+export const balanceFunction = {
+    contractAddress: "0x69d33A63B775542AEE4cBc432AD990046D160a4d",
+    abi: ABI,
+    functionName: "get",
+    params: { addr: "" }
+};
