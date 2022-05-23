@@ -83,6 +83,10 @@ export const styles = {
         color: 'black',
         marginTop: '-10%'
     },
+    text: {
+        fontSize: '15px',
+        color: 'black'
+    },
     landingLogo: {
         height: '60%',
     }

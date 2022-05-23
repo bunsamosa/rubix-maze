@@ -22,6 +22,25 @@ const urls = [
 ].reduce<string[]>((acc, val) => acc.concat(val), []);
 
 let placesData = {};
+let dataFetched = false;
+let defaultPlace = {
+    "name": "Department of Archaeology and Museums",
+    "place_id": "ChIJqyoigt8VrjsRruQyccBZzHI",
+    "lat": 12.97465,
+    "lng": 77.5958911,
+    "rating": 4.3,
+    "tags": [
+        "museum",
+        "tourist_attraction",
+        "point_of_interest",
+        "establishment"
+    ],
+    "vicinity": "XHFW+V92, Venkatappa Art Gallery Building, Kasturba Road, Bengaluru",
+    "location_name": "MG Road",
+    "best_time": "3 PM",
+    "best_travel_option": "Take an auto from Church Street"
+};
+let mapUrl = `https://www.google.com/maps/search/?api=1&query=${defaultPlace.lat}%2C${defaultPlace.lng}`;
 
 export default function App() {
     // find width and height
@@ -42,6 +61,12 @@ export default function App() {
     const [modalIsOpen, setIsOpen] = React.useState(false);
 
     function openModal() {
+        const keys = Object.keys(placesData);
+        const randIndex = Math.floor(Math.random() * keys.length);
+        const randKey = keys[randIndex];
+        defaultPlace = placesData[randKey];
+        mapUrl = `https://www.google.com/maps/search/?api=1&query=${defaultPlace.lat}%2C${defaultPlace.lng}`;
+        console.log(defaultPlace);
         setIsOpen(true);
     };
 
@@ -60,6 +85,7 @@ export default function App() {
         const response = await fetch(url);
         placesData = await response.json();
         console.log(placesData);
+        dataFetched = true;
         return placesData;
     };
 
@@ -92,11 +118,13 @@ export default function App() {
 
     // save data to IPFS
     const saveData = async () => {
-        const file = new Moralis.File("rubix_places.json", {
-            base64: btoa(JSON.stringify(placesData)),
-        });
-        await file.saveIPFS();
-        console.log(file.toJSON());
+        if (dataFetched) {
+            const file = new Moralis.File("rubix_places.json", {
+                base64: btoa(JSON.stringify(placesData)),
+            });
+            await file.saveIPFS();
+            console.log(file.toJSON());
+        }
     };
 
     // user connected - return game and logout button
@@ -115,11 +143,15 @@ export default function App() {
                         style={styles.content}
                         contentLabel="Wiki Modal"
                     >
-                        <h2 ref={(_subtitle) => { subtitle = _subtitle }}>Add You Wiki Here!</h2>
+                        <h2 ref={(_subtitle) => { subtitle = _subtitle }}>Welcome to {defaultPlace.name}!</h2>
+                        <p style={styles.text}>Attraction: {defaultPlace.tags[0]}</p>
+                        <a href={mapUrl} target="_blank" rel="noopener noreferrer">Location</a>
+                        <p style={styles.text}>Best time to reach: {defaultPlace.best_time}</p>
+                        <p style={styles.text}>Best way to reach: {defaultPlace.best_travel_option}</p>
                         <button type="button" onClick={closeModal} style={styles.closeButton}>close</button>
                         <form>
                             <div contentEditable='true' style={styles.textAreaAlign}>
-                                <textarea style={styles.textArea} placeholder='Type your wiki here...' />
+                                <textarea style={styles.textArea} placeholder='Add additional details here' />
                             </div>
                             <div style={styles.buttonDiv}>
                                 <button type="button" style={styles.modalButtons} onClick={saveData}>Save</button>
