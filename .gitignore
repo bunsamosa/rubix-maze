@@ -5,3 +5,5 @@ package/
 /.eslintrc*
 /.prettierrc*
 /tsconfig.json
+
+.DS_Store
