@@ -1,5 +1,6 @@
 import { css, Global } from '@emotion/core';
 import React, { useEffect } from 'react';
+import Modal from 'react-modal';
 import { useMoralis } from 'react-moralis';
 import AssetLoader from './@core/AssetLoader';
 import Game from './@core/Game';
@@ -7,7 +8,9 @@ import Scene from './@core/Scene';
 import SceneManager from './@core/SceneManager';
 import useWindowSize from './@core/useWindowSize';
 import OfficeScene from './scenes/OfficeScene';
-import OtherScene from './scenes/OtherScene';
+import ParkScene from './scenes/ParkScene';
+import CafeScene from './scenes/CafeScene';
+import LibraryScene from './scenes/LibraryScene';
 import soundData from './soundData';
 import spriteData from './spriteData';
 import globalStyles from './styles/global';
@@ -20,6 +23,63 @@ const styles = {
         justify-content: center;
         align-items: center;
     `,
+    button: {
+        backgroundColor: '#C4A484',
+        height: '3rem',
+        width: '10rem',
+        borderRadius: '10px',
+        textAlign: 'center' as const,
+        fontWeight: 'bold' as const,
+        fontSize: '1.5rem',
+        cursor: 'pointer' as const,
+    },
+    divAlign: {
+        display: 'flex',
+        flexDirection: 'column' as const,
+        marginLeft: '2rem',
+        marginRight: '-2rem',
+    },
+    content: {
+        top: '50%',
+        left: '50%',
+        right: 'auto',
+        bottom: 'auto',
+        marginRight: '-50%',
+        transform: 'translate(-50%, -50%)',
+    },
+    closeButton: {
+        backgroundColor: 'red',
+        color: 'white',
+        fontSize: '1rem',
+        border: 'none',
+        cursor: 'pointer',
+        width: '5rem',
+        height: '2rem',
+        borderRadius: '5px'
+    },
+    modalButtons: {
+        backgroundColor: 'green',
+        color: 'white',
+        fontSize: '1rem',
+        border: 'none',
+        cursor: 'pointer',
+        width: '5rem',
+        height: '2rem',
+        borderRadius: '5px'
+    },
+    buttonDiv: {
+        display: 'flex',
+        flexDirection: 'row' as const,
+        gap: '1rem',
+        marginTop: '1rem',
+    },
+    textArea: {
+        width: '100%',
+        height: '10rem',
+    },
+    textAreaAlign: {
+        marginTop: '1rem',
+    }
 };
 
 const urls = [
@@ -40,6 +100,23 @@ export default function App() {
         account,
         logout,
     } = useMoralis();
+
+    // Modal changes
+    let subtitle;
+    const [modalIsOpen, setIsOpen] = React.useState(false);
+
+    function openModal() {
+        setIsOpen(true);
+    }
+
+    function afterOpenModal() {
+        // references are now sync'd and can be accessed.
+        subtitle.style.color = 'black';
+    }
+
+    function closeModal() {
+        setIsOpen(false);
+    }
 
     useEffect(() => {
         if (isAuthenticated) {
@@ -71,19 +148,54 @@ export default function App() {
     // user connected - return game and logout button
     const renderConnectedContainer = () => (
         <div css={styles.root(width, height)}>
-            <p>
-                <button type="button" onClick={logOut} disabled={isAuthenticating}>
+            <div style={styles.divAlign}>
+                <button type="button" onClick={logOut} disabled={isAuthenticating} style={styles.button}>
                     Logout
                 </button>
-            </p>
+                <div>
+                    <button type="button" onClick={openModal} style={styles.button}>Wiki</button>
+                    <Modal
+                        isOpen={modalIsOpen}
+                        onAfterOpen={afterOpenModal}
+                        onRequestClose={closeModal}
+                        style={styles.content}
+                        contentLabel="Wiki Modal"
+                    >
+                        <h2 ref={(_subtitle) => { subtitle = _subtitle }}>Add You Wiki Here!</h2>
+                        <button type="button" onClick={closeModal} style={styles.closeButton}>close</button>
+                        <form>
+                            <div contentEditable='true' style={styles.textAreaAlign}>
+                                <textarea style={styles.textArea} placeholder='Type your wiki here...' />
+                            </div>
+                            <div style={styles.buttonDiv}>
+                                <button type="button" style={styles.modalButtons}>Save</button>
+                                <button type="button" style={styles.modalButtons}>Edit</button>
+                                <button type="button" style={styles.closeButton}>Delete</button>
+                            </div>
+                        </form>
+                    </Modal>
+                </div>
+                <button type="button" style={styles.button}>
+                    Host
+                </button>
+                <button type="button" style={styles.button}>
+                    Conquer
+                </button>
+            </div>
             <Game cameraZoom={80}>
                 <AssetLoader urls={urls} placeholder="Loading assets ...">
                     <SceneManager defaultScene="office">
                         <Scene id="office">
                             <OfficeScene />
                         </Scene>
-                        <Scene id="other">
-                            <OtherScene />
+                        <Scene id="park">
+                            <ParkScene />
+                        </Scene>
+                        <Scene id="cafe">
+                            <CafeScene />
+                        </Scene>
+                        <Scene id="library">
+                            <LibraryScene />
                         </Scene>
                     </SceneManager>
                 </AssetLoader>
