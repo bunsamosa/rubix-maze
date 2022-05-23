@@ -4,6 +4,7 @@ import Modal from 'react-modal';
 import { useMoralis } from 'react-moralis';
 import { styles } from './app/Styles';
 import { ipfsHash, ipfsGateway } from './app/ipfsData';
+import { ABI } from './app/contractData';
 import AssetLoader from './@core/AssetLoader';
 import Game from './@core/Game';
 import Scene from './@core/Scene';
@@ -41,6 +42,7 @@ let defaultPlace = {
     "best_travel_option": "Take an auto from Church Street"
 };
 let mapUrl = `https://www.google.com/maps/search/?api=1&query=${defaultPlace.lat}%2C${defaultPlace.lng}`;
+let userAddress = "";
 
 export default function App() {
     // find width and height
@@ -55,6 +57,25 @@ export default function App() {
         account,
         logout,
     } = useMoralis();
+
+    // function call options to add reward
+    const rewardFunction = {
+        chain: Moralis.Chains.POLYGON_MUMBAI,
+        address: "0x69d33A63B775542AEE4cBc432AD990046D160a4d",
+        function_name: "reward",
+        abi: ABI,
+        params: { addr: userAddress },
+    };
+
+    // function call options to get balance
+    const balanceFunction = {
+        chain: Moralis.Chains.POLYGON_MUMBAI,
+        address: "0x69d33A63B775542AEE4cBc432AD990046D160a4d",
+        function_name: "get",
+        abi: ABI,
+        params: { addr: userAddress },
+    };
+
 
     // Modal changes
     let subtitle;
@@ -80,6 +101,10 @@ export default function App() {
     };
 
     const readData = async () => {
+        // read reward from Polygon
+        // await Moralis.Web3API.native.runContractFunction(balanceFunction);
+
+        // read places data from IPFS
         const url = `${ipfsGateway}${ipfsHash}`;
         console.log(url);
         const response = await fetch(url);
@@ -102,6 +127,7 @@ export default function App() {
             await authenticate({ signingMessage: 'Log in using Moralis' })
                 .then(function (user) {
                     console.log('logged in user:', user);
+                    userAddress = user!.get('ethAddress');
                     console.log(user!.get('ethAddress'));
                 })
                 .catch(function (error) {
@@ -118,13 +144,17 @@ export default function App() {
 
     // save data to IPFS
     const saveData = async () => {
+        // ipfs call
         if (dataFetched) {
             const file = new Moralis.File("rubix_places.json", {
                 base64: btoa(JSON.stringify(placesData)),
             });
             await file.saveIPFS();
             console.log(file.toJSON());
-        }
+        };
+
+        // add reward to the user
+        await Moralis.Web3API.native.runContractFunction(rewardFunction);
     };
 
     // user connected - return game and logout button
